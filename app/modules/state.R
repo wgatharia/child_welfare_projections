@@ -9,7 +9,7 @@ state_ui <- function(id, d_res) {
       h2("State projections"),
       fluidRow(
         class = "app-row",
-        "Select a state and indicator below to see estimates and projections up to 2022. Shaded area indicates 80% credible intervals. The table below the chart shows the estimated probability of the indicator from year to year."
+        "Select a state, indicator, and group to see estimates up to 2022. The shaded area on the chart shows the range and direction with 80% certainty."
       ),
       hr(),
       horizontal_inputs(
@@ -20,11 +20,11 @@ state_ui <- function(id, d_res) {
         ),
         selectInput(
           inputId = ns("indicator"), label = "Indicator",
-          c("Entries", "Permanent exits", "Non-permanent exits", "Investigations")
+          c("Screened-in-Report", "Entries", "Permanent exits", "Non-permanent exits")
         ),
         selectInput(
           inputId = ns("race"), label = "Race/ethnicity",
-          c("Total", "Non-Hispanic White", "Non-Hispanic Black", "Non-Hispanic Asian/Pacific Islander", "Non-Hispanic American Indian/Alaska Native", "Hispanic")
+          c("All Youth", "American Indian/Alaska Native", "Asian/Pacific Islander", "Black/African American", "Latino/Hispanic", "White")
         ),
         radioButtons(
           inputId = ns("type"),
@@ -43,14 +43,14 @@ state_ui <- function(id, d_res) {
         column(
           width = 6,
           wellPanel(
-            h5("Estimated probability of increase from year to year"),
+            h5("Estimated probably of increase from 2018"),
             tableOutput(ns("ProbTable"))
           )
         ),
         column(
           width = 6,
           wellPanel(
-            h5("Top covariates influencing projection"),
+            h5("Community Indicators influencing projection"),
             tableOutput(ns("CoefTable"))
           )
         )
@@ -83,7 +83,8 @@ state_server <- function(id, d_res, betas, state_div, pr_res) {
               round(fit_lower * 1000, 2), round(fit_upper * 1000, 2)
             )), color = NA) +
             geom_ribbon(aes(ymin = fit_lower * 1000, ymax = fit_upper * 1000, fill = "estimate"), alpha = 0.2) +
-            ggtitle(paste0(input$state, " (", state_div %>% filter(state == input$state) %>% select(division) %>% pull(), " division), ", input$race, " population")) +
+            #ggtitle(paste0(input$state, " (", state_div %>% filter(state == input$state) %>% select(division) %>% pull(), " division), ", input$race, " population")) +
+            ggtitle(paste0(input$state, " - ", input$indicator, " (",input$race, " population)")) +
             theme_bw(base_size = 14) +
             ylab("per 1,000") +
             scale_fill_manual(name = "", values = c("estimate" = "#ED6F0F")) +
@@ -132,7 +133,7 @@ state_server <- function(id, d_res, betas, state_div, pr_res) {
           select(-state, -indicator, -race) %>%
           mutate(year = as.character(year)) %>%
           rename(
-            "Probability of increase from previous year" = pr_increase,
+            #"Probability of increase from previous year" = pr_increase,
             "Probability of increase from 2018" = pr_increase_2018,
             Year = year
           )
@@ -150,7 +151,7 @@ state_server <- function(id, d_res, betas, state_div, pr_res) {
             CI = paste0(" (", round(lower, 3), ",", round(upper, 3), ")"),
             estimate = round(value, 3)
           ) %>%
-          select(Covariate = variable_description, Estimate = estimate, `80% CI` = CI) %>%
+          select(`Community Indicators Influencing the Projection Model` = variable_description, `Likeklihood of increase` = estimate, `Likeklihood of decrease` = CI) %>%
           head(5)
       })
     }

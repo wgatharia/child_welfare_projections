@@ -21,7 +21,7 @@ library(markdown)
 
 d_res <- read_csv("results/d_res.csv")
 betas <- read_csv("results/betas.csv")
-pr_res <- read_csv("results/pr_res.csv")
+pr_res <- read_csv("results/pr_res.csv")[, c("state","year","pr_increase_2018","indicator","race")]
 state_div <- read_csv("inputs/state_division.csv")
 
 # 2. Create national map --------------------------------------------------
@@ -44,10 +44,10 @@ Noax <- list(
 # 3. Shiny code -----------------------------------------------------------
 
 source("modules/app_page.R")
-source("modules/national.R")
+#source("modules/national.R")
 source("modules/state.R")
-source("modules/covariates.R")
-source("modules/about.R")
+#source("modules/covariates.R")
+#source("modules/about.R")
 source("modules/utils.R")
 
 options(spinner.color = "#ED6F0F")
@@ -63,16 +63,16 @@ ui <- tagList(
     theme = bs_theme(version = 3, bg = "white", fg = "black", primary = "#ED6F0F"),
     header = div(class = "app-page", h3("Trends and projections of foster care indicators in the United States")),
     # National tab content
-    national_ui("national", d_res = d_res),
+    #national_ui("national", d_res = d_res),
 
     # State tab content
-    state_ui("state", d_res = d_res),
-
+    #state_ui("state", d_res = d_res),
+    state_ui("state", d_res = d_res)
     # Covariates tab content
-    covariates_ui("covariates", betas = betas),
+    #covariates_ui("covariates", betas = betas),
 
     # About tab content
-    about_ui()
+    #about_ui()
   )
 )
 
@@ -81,13 +81,13 @@ ui <- tagList(
 server <- function(input, output) {
 
   # National Map
-  national_server("national", d_res = d_res, merged_data = merged_data, Noax = Noax)
+  #national_server("national", d_res = d_res, merged_data = merged_data, Noax = Noax)
 
   # State Server
   state_server("state", d_res = d_res, betas = betas, state_div = state_div, pr_res = pr_res)
 
   # Covariates Server
-  covariates_server("covariates", betas = betas)
+  #covariates_server("covariates", betas = betas)
 }
 
 # Run the application
