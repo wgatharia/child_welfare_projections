@@ -43,7 +43,7 @@ state_ui <- function(id, d_res) {
         column(
           width = 6,
           wellPanel(
-            h5("Estimated probably of increase from 2018"),
+            h5("Likelihood of increase from 2018"),
             tableOutput(ns("ProbTable"))
           )
         ),
@@ -134,7 +134,7 @@ state_server <- function(id, d_res, betas, state_div, pr_res) {
           mutate(year = as.character(year)) %>%
           rename(
             #"Probability of increase from previous year" = pr_increase,
-            "Probability of increase from 2018" = pr_increase_2018,
+            "Likelihood of increase from 2018" = pr_increase_2018,
             Year = year
           )
       })
@@ -151,7 +151,7 @@ state_server <- function(id, d_res, betas, state_div, pr_res) {
             CI = paste0(" (", round(lower, 3), ",", round(upper, 3), ")"),
             estimate = round(value, 3)
           ) %>%
-          select(`Community Indicators Influencing the Projection Model` = variable_description, `Likeklihood of increase` = estimate, `Likeklihood of decrease` = CI) %>%
+          select(`Community Indicators Influencing the Projection Model` = variable_description, `Estimate` = estimate, `80% CI` = CI) %>%
           head(5)
       })
     }
